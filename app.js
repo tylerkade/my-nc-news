@@ -2,11 +2,7 @@ const express = require("express");
 
 const { getApi, getTopics } = require("./controllers/app.controller");
 
-const {
-  wrongPathErrorHandler,
-  customErrorHandler,
-  serverErrorHandler,
-} = require("./errors/app.errors");
+const { wrongPathErrorHandler } = require("./errors/app.errors");
 
 const app = express();
 
