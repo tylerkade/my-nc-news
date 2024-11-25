@@ -5,6 +5,7 @@ const {
   fetchArticles,
   fetchArticleByIdComments,
   pushComment,
+  patchVotes,
 } = require("../models/app.model");
 
 exports.getApi = (req, res) => {
@@ -51,6 +52,16 @@ exports.postComment = (req, res, next) => {
   pushComment(article_id, username, body)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.incrementArticleVotes = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+  patchVotes(article_id, inc_votes)
+    .then((article) => {
+      res.status(200).send({ article });
     })
     .catch(next);
 };

@@ -6,7 +6,8 @@ const {
   getArticleById,
   getArticles,
   getArticleByIdComments,
-  postComment
+  postComment,
+  incrementArticleVotes,
 } = require("./controllers/app.controller");
 
 const {
@@ -31,6 +32,8 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getArticleByIdComments);
 
 app.post("/api/articles/:article_id/comments", postComment);
+
+app.patch("/api/articles/:article_id", incrementArticleVotes);
 
 app.use(wrongPathErrorHandler);
 

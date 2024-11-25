@@ -292,3 +292,108 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with the updated article with added votes", () => {
+    const newVotes = {
+      inc_votes: 10,
+    };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVotes)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.votes).toBe(110);
+      });
+  });
+
+  test("200: Responds with the updated article with minus votes", () => {
+    const newVotes = {
+      inc_votes: -137,
+    };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVotes)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.votes).toBe(-37);
+      });
+  });
+
+  test("404: Responds with an article not found error when trying to update an article that doesn't exist", () => {
+    const newVotes = {
+      inc_votes: 10,
+    };
+
+    return request(app)
+      .patch("/api/articles/9999")
+      .send(newVotes)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("article not found");
+      });
+  });
+
+  test("400: Responds with a bad request error when trying to update an invalid article", () => {
+    const newVotes = {
+      inc_votes: 10,
+    };
+
+    return request(app)
+      .patch("/api/articles/not-an-article")
+      .send(newVotes)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("bad request");
+      });
+  });
+
+  test("400: Responds with a bad request error when trying to update an article with invalid data", () => {
+    const newVotes = {
+      inc_votes: "Not-a-number",
+    };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVotes)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("bad request");
+      });
+  });
+
+  test("400: Responds with a bad request error when trying to update an article with incorrectly named data", () => {
+    const newVotes = {
+      not_votes: 10,
+    };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVotes)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("bad request");
+      });
+  });
+
+  test("400: Responds with a bad request error when trying to update an article with no data", () => {
+    const newVotes = {};
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVotes)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("bad request");
+      });
+  });
+});
