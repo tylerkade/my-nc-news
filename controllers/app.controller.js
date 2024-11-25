@@ -4,6 +4,7 @@ const {
   fetchArticle,
   fetchArticles,
   fetchArticleByIdComments,
+  pushComment,
 } = require("../models/app.model");
 
 exports.getApi = (req, res) => {
@@ -40,6 +41,16 @@ exports.getArticleByIdComments = (req, res, next) => {
   fetchArticleByIdComments(article_id)
     .then((comments) => {
       res.status(200).send({ comments });
+    })
+    .catch(next);
+};
+
+exports.postComment = (req, res, next) => {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+  pushComment(article_id, username, body)
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch(next);
 };

@@ -54,5 +54,17 @@
       "votes": 10,
       "created_at": "2020-10-16T05:03:00.000Z"
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts an object containing a valid username, and comment body, and serves it back to the user",
+    "queries": [],
+    "exampleResponse": {
+      "comment_id": 19,
+      "body": "New Comment",
+      "article_id": 1,
+      "author": "butter_bridge",
+      "votes": 0,
+      "created_at": "2024-11-16T05:03:00.000Z"
+    }
   }
 }
