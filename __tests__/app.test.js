@@ -61,7 +61,7 @@ describe("GET /api/articles/:article_id", () => {
         expect(article).toMatchObject({
           author: expect.any(String),
           title: expect.any(String),
-          article_id: expect.any(Number),
+          article_id: 2,
           topic: expect.any(String),
           created_at: expect.any(String),
           votes: expect.any(Number),
@@ -144,7 +144,7 @@ describe("GET /api/articles/:article_id/comments", () => {
           expect(comment).toHaveProperty("created_at");
           expect(comment).toHaveProperty("author");
           expect(comment).toHaveProperty("body");
-          expect(comment).toHaveProperty("article_id");
+          expect(comment.article_id).toBe(1);
         });
       });
   });
