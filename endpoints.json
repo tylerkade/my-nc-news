@@ -69,5 +69,9 @@
       "votes": 0,
       "created_at": "2024-11-16T05:03:00.000Z"
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the specified comment",
+    "queries": []
   }
 }
