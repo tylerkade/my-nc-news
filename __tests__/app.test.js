@@ -106,7 +106,7 @@ describe("GET /api/articles/", () => {
           expect(article).toHaveProperty("topic");
           expect(article).toHaveProperty("created_at");
           expect(article).toHaveProperty("votes");
-          expect(article).toHaveProperty("article_img_url");
+          expect(article).not.toHaveProperty("article_img_url");
           expect(article).toHaveProperty("comment_count");
           expect(typeof article.comment_count).toBe("number");
           expect(article).not.toHaveProperty("body");
@@ -208,9 +208,9 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(comment).toHaveProperty("comment_id");
         expect(comment).toHaveProperty("votes");
         expect(comment).toHaveProperty("created_at");
-        expect(comment).toHaveProperty("author");
-        expect(comment).toHaveProperty("body");
-        expect(comment).toHaveProperty("article_id");
+        expect(comment.author).toBe("butter_bridge");
+        expect(comment.body).toBe("New comment");
+        expect(comment.article_id).toBe(1);
       });
   });
 
@@ -395,5 +395,19 @@ describe("PATCH /api/articles/:article_id", () => {
         const { msg } = body;
         expect(msg).toBe("bad request");
       });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: Responds with a 204 status code and no content when deleting a comment", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+
+  test("404: Responds with a comment not found error when trying to delete a comment that doesn't exist", () => {
+    return request(app).delete("/api/comments/999").expect(404);
+  });
+
+  test("400: Responds with a bad request error when trying to delete an invalid comment", () => {
+    return request(app).delete("/api/comments/not-a-comment_id").expect(400);
   });
 });
