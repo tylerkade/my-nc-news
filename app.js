@@ -8,6 +8,7 @@ const {
   getArticleByIdComments,
   postComment,
   incrementArticleVotes,
+  deleteComment,
 } = require("./controllers/app.controller");
 
 const {
@@ -34,6 +35,8 @@ app.get("/api/articles/:article_id/comments", getArticleByIdComments);
 app.post("/api/articles/:article_id/comments", postComment);
 
 app.patch("/api/articles/:article_id", incrementArticleVotes);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use(wrongPathErrorHandler);
 

@@ -27,7 +27,7 @@ exports.fetchArticles = () => {
     .query(
       `
     SELECT a.article_id, a.title, a.topic, a.author, a.created_at, 
-    a.votes, a.article_img_url, COUNT(c.comment_id)::INTEGER AS comment_count
+    a.votes, COUNT(c.comment_id)::INTEGER AS comment_count
     FROM articles a
     LEFT JOIN comments c ON a.article_id = c.article_id
     GROUP BY a.article_id
@@ -89,4 +89,15 @@ exports.patchVotes = (article_id, inc_votes) => {
       }
       return rows[0];
     });
+};
+
+exports.removeComment = (comment_id) => {
+  return db.query(
+    `
+    DELETE FROM comments
+    WHERE comment_id = $1
+    RETURNING *;
+    `,
+    [comment_id]
+  );
 };

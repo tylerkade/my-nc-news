@@ -6,6 +6,7 @@ const {
   fetchArticleByIdComments,
   pushComment,
   patchVotes,
+  removeComment,
 } = require("../models/app.model");
 
 exports.getApi = (req, res) => {
@@ -62,6 +63,18 @@ exports.incrementArticleVotes = (req, res, next) => {
   patchVotes(article_id, inc_votes)
     .then((article) => {
       res.status(200).send({ article });
+    })
+    .catch(next);
+};
+
+exports.deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  removeComment(comment_id)
+    .then((comment) => {
+      if (comment.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "comment not found" });
+      }
+      res.status(204).send();
     })
     .catch(next);
 };
