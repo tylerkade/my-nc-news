@@ -488,3 +488,39 @@ describe("GET /api/articles?sort_by=created_at&order=DESC", () => {
       });
   });
 });
+
+describe("GET /api/articles?topic=", () => {
+  test("200: Responds with all articles about the featured topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(1);
+        articles.forEach((article) => {
+          expect(article.topic).toBe("cats");
+        });
+      });
+  });
+
+  test("200: Responds with an empty array when querying an existing topic that has no articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toEqual([]);
+      });
+  });
+
+  test("404: Responds with a not found error when querying a topic that doesn't exist", () => {
+    return request(app)
+      .get("/api/articles?topic=none-existent-topic")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("topic not found");
+        // Maybe have it send an empty array instead of an err?
+      });
+  });
+});

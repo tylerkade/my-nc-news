@@ -22,7 +22,11 @@ exports.fetchArticle = (id) => {
     });
 };
 
-exports.fetchArticles = (sort_by = "created_at", order = "DESC") => {
+exports.fetchArticles = async (
+  sort_by = "created_at",
+  order = "DESC",
+  topic
+) => {
   const validSortBy = [
     "created_at",
     "article_id",
@@ -32,6 +36,7 @@ exports.fetchArticles = (sort_by = "created_at", order = "DESC") => {
     "votes",
     "comment_count",
   ];
+
   if (!validSortBy.includes(sort_by.toLowerCase())) {
     return Promise.reject({ status: 404, msg: "column not found" });
   } else if (sort_by !== "comment_count") {
@@ -47,9 +52,25 @@ exports.fetchArticles = (sort_by = "created_at", order = "DESC") => {
     SELECT a.article_id, a.title, a.topic, a.author, a.created_at, 
     a.votes, COUNT(c.comment_id)::INTEGER AS comment_count
     FROM articles a
-    LEFT JOIN comments c ON a.article_id = c.article_id
-    GROUP BY a.article_id `;
+    LEFT JOIN comments c ON a.article_id = c.article_id `;
   const queryValues = [];
+
+  if (topic) {
+    const getValidTopics = () => {
+      const query = `SELECT DISTINCT slug FROM topics;`;
+      return db.query(query).then(({ rows }) => rows.map((row) => row.slug));
+    };
+    await getValidTopics().then((validTopics) => {
+      if (!validTopics.includes(topic.toLowerCase())) {
+        return Promise.reject({ status: 404, msg: "topic not found" });
+      } else {
+        queryValues.push(topic);
+        sqlQuery += `WHERE topic = $${queryValues.length} `;
+      }
+    });
+  }
+
+  sqlQuery += `GROUP BY a.article_id `;
 
   if (sort_by) {
     sqlQuery += `ORDER BY ${sort_by} ${order} `;

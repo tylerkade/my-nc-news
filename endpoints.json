@@ -13,7 +13,7 @@
     "description": "serves an array of all articles, sorted by date in descending order",
     "queries": [
       "author",
-      "topic",
+      { "topic": ["mitch", "cats", "paper"] },
       {
         "sort_by": [
           "created_at",
