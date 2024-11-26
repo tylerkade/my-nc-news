@@ -420,7 +420,6 @@ describe("GET /api/users", () => {
       .then(({ body }) => {
         const { users } = body;
         users.forEach((user) => {
-          console.log(user);
           expect(user).toMatchObject({
             username: expect.any(String),
             name: expect.any(String),
@@ -438,11 +437,54 @@ describe("GET /api/users", () => {
             .get("/api/users")
             .expect(200)
             .then(({ body }) => {
-              console.log(body);
               expect(body.users).toEqual([]);
             });
         });
       });
     });
+  });
+});
+
+describe("GET /api/articles?sort_by=created_at&order=DESC", () => {
+  test("200: Responds with an array of articles sorted by created_at in desc order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at&order=DESC")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+
+  test("200: Responds with an array of articles sorted by comment_count in asc order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count&order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("comment_count");
+      });
+  });
+
+  test("404: Responds with a not found error when given an column that doesn't exist", () => {
+    return request(app)
+      .get("/api/articles?sort_by=not-a-sort_by-value&order=ASC")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("column not found");
+      });
+  });
+
+  test("400: Responds with an bad request error when given an invalid order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=not-an-order")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("bad request");
+      });
   });
 });
