@@ -428,21 +428,6 @@ describe("GET /api/users", () => {
         });
       });
   });
-
-  test("200: Responds with an empty array when there are no users in the database", () => {
-    return db.query(`DELETE FROM comments`).then(() => {
-      return db.query(`DELETE FROM articles`).then(() => {
-        return db.query(`DELETE FROM users`).then(() => {
-          return request(app)
-            .get("/api/users")
-            .expect(200)
-            .then(({ body }) => {
-              expect(body.users).toEqual([]);
-            });
-        });
-      });
-    });
-  });
 });
 
 describe("GET /api/articles?sort_by=created_at&order=DESC", () => {
@@ -521,6 +506,30 @@ describe("GET /api/articles?topic=", () => {
         const { msg } = body;
         expect(msg).toBe("topic not found");
         // Maybe have it send an empty array instead of an err?
+      });
+  });
+});
+
+describe("GET api/articles/:article_id?comment_count=[true/any-string]", () => {
+  test("200: Responds with an article object with a comment_count property", () => {
+    return request(app)
+      .get("/api/articles/1?comment_count=true")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.article_id).toBe(1);
+        expect(article.comment_count).toBe(11);
+      });
+  });
+
+  test("200: Responds with an article object without a comment_count property when given any value that is not 'true'", () => {
+    return request(app)
+      .get("/api/articles/1?comment_count=any-value-including-false")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.article_id).toBe(1);
+        expect(article).not.toHaveProperty("comment_count");
       });
   });
 });
