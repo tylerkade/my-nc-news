@@ -22,20 +22,42 @@ exports.fetchArticle = (id) => {
     });
 };
 
-exports.fetchArticles = () => {
-  return db
-    .query(
-      `
+exports.fetchArticles = (sort_by = "created_at", order = "DESC") => {
+  const validSortBy = [
+    "created_at",
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "votes",
+    "comment_count",
+  ];
+  if (!validSortBy.includes(sort_by.toLowerCase())) {
+    return Promise.reject({ status: 404, msg: "column not found" });
+  } else if (sort_by !== "comment_count") {
+    sort_by = "a." + sort_by;
+  }
+
+  const validOrder = ["ASC", "DESC"];
+  if (!validOrder.includes(order.toUpperCase())) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+
+  let sqlQuery = `
     SELECT a.article_id, a.title, a.topic, a.author, a.created_at, 
     a.votes, COUNT(c.comment_id)::INTEGER AS comment_count
     FROM articles a
     LEFT JOIN comments c ON a.article_id = c.article_id
-    GROUP BY a.article_id
-    ORDER BY a.created_at DESC;`
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+    GROUP BY a.article_id `;
+  const queryValues = [];
+
+  if (sort_by) {
+    sqlQuery += `ORDER BY ${sort_by} ${order} `;
+  }
+
+  return db.query(sqlQuery, queryValues).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.fetchArticleByIdComments = (id) => {
