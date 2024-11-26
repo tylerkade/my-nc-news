@@ -72,10 +72,7 @@ exports.incrementArticleVotes = (req, res, next) => {
 exports.deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
   removeComment(comment_id)
-    .then((comment) => {
-      if (comment.rowCount === 0) {
-        return Promise.reject({ status: 404, msg: "comment not found" });
-      }
+    .then(() => {
       res.status(204).send();
     })
     .catch(next);
