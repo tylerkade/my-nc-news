@@ -40,7 +40,7 @@ describe("GET /api/topics", () => {
       });
   });
 
-  test("404: Responds with a not found error message", () => {
+  test("404: Responds with a not found error message when an incorrect route is given", () => {
     return request(app)
       .get("/api/not-a-route")
       .expect(404)
@@ -409,5 +409,40 @@ describe("DELETE /api/comments/:comment_id", () => {
 
   test("400: Responds with a bad request error when trying to delete an invalid comment", () => {
     return request(app).delete("/api/comments/not-a-comment_id").expect(400);
+  });
+});
+
+describe("GET /api/users", () => {
+  test("200: Responds with an array of all users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        users.forEach((user) => {
+          console.log(user);
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+
+  test("200: Responds with an empty array when there are no users in the database", () => {
+    return db.query(`DELETE FROM comments`).then(() => {
+      return db.query(`DELETE FROM articles`).then(() => {
+        return db.query(`DELETE FROM users`).then(() => {
+          return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body }) => {
+              console.log(body);
+              expect(body.users).toEqual([]);
+            });
+        });
+      });
+    });
   });
 });

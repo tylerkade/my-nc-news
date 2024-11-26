@@ -73,5 +73,21 @@
   "DELETE /api/comments/:comment_id": {
     "description": "deletes the specified comment",
     "queries": []
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users in the database",
+    "queries": [],
+    "exampleResponse": [
+      {
+        "username": "icellusedkars",
+        "name": "sam",
+        "avatar_url": "A URL"
+      },
+      {
+        "username": "rogersop",
+        "name": "paul",
+        "avatar_url": "A URL"
+      }
+    ]
   }
 }
