@@ -422,7 +422,7 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
 
-    test("400: Responds with an bad request error message when an non-existing username is provided", () => {
+    test("404: Responds with an not found error when an non-existing username is provided", () => {
       const newComment = {
         username: "wrong_username",
         body: "New comment",
@@ -431,10 +431,10 @@ describe("/api/articles/:article_id/comments", () => {
       return request(app)
         .post("/api/articles/1/comments")
         .send(newComment)
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("bad request");
+          expect(msg).toBe("not found");
         });
     });
 
@@ -468,7 +468,7 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
 
-    test("400: Responds with an bad request error message when the article doesn't exist", () => {
+    test("404: Responds with an not found error when the article doesn't exist", () => {
       const newComment = {
         username: "butter_bridge",
         body: "New comment",
@@ -477,10 +477,10 @@ describe("/api/articles/:article_id/comments", () => {
       return request(app)
         .post("/api/articles/9999/comments")
         .send(newComment)
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("bad request");
+          expect(msg).toBe("not found");
         });
     });
 
