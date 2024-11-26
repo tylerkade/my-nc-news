@@ -369,23 +369,23 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
 
-    test("404: Responds with an 'article or comments not found' error message (article doesn't exist)", () => {
+    test("404: Responds with an 'article not found' error message (article doesn't exist)", () => {
       return request(app)
         .get("/api/articles/9999/comments")
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("article or comments not found");
+          expect(msg).toBe("article not found");
         });
     });
 
-    test("404: Responds with an 'article or comments not found' error message (article exists, no comments)", () => {
+    test("200: Responds with an empty array (article exists, no comments)", () => {
       return request(app)
         .get("/api/articles/2/comments")
-        .expect(404)
+        .expect(200)
         .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("article or comments not found");
+          const { comments } = body;
+          expect(comments).toEqual([]);
         });
     });
 

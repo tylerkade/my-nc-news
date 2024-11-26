@@ -8,6 +8,7 @@ const {
   patchVotes,
   removeComment,
   fetchUsers,
+  checkArticleExists,
 } = require("../models/app.model");
 
 exports.getApi = (req, res) => {
@@ -43,8 +44,13 @@ exports.getArticles = (req, res, next) => {
 
 exports.getArticleByIdComments = (req, res, next) => {
   const { article_id } = req.params;
-  fetchArticleByIdComments(article_id)
-    .then((comments) => {
+  const promises = [
+    fetchArticleByIdComments(article_id),
+    checkArticleExists(article_id),
+  ];
+
+  Promise.all(promises)
+    .then(([comments]) => {
       res.status(200).send({ comments });
     })
     .catch(next);
