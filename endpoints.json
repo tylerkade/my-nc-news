@@ -122,5 +122,16 @@
         "avatar_url": "A URL"
       }
     ]
+  },
+  "GET /api/users/:username": {
+    "description": "serves an object of the specified usernames properties",
+    "queries": [],
+    "exampleResponse": [
+      {
+        "username": "icellusedkars",
+        "name": "sam",
+        "avatar_url": "A URL"
+      }
+    ]
   }
 }
