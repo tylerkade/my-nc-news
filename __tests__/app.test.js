@@ -11,6 +11,7 @@ const data = require(`${__dirname}/../db/data/test-data/index`);
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
+
 describe("/api", () => {
   describe("GET", () => {
     test("200: Responds with an object detailing the documentation for each endpoint", () => {
@@ -655,66 +656,66 @@ describe("/api/comments", () => {
             expect(comment.votes).toBe(6);
           });
       });
-    });
 
-    test("404: Responds with a comment not found error when trying to update a comment that doesn't exist", () => {
-      const newVotes = {
-        inc_votes: 10,
-      };
+      test("404: Responds with a comment not found error when trying to update a comment that doesn't exist", () => {
+        const newVotes = {
+          inc_votes: 10,
+        };
 
-      return request(app)
-        .patch("/api/comments/9999")
-        .send(newVotes)
-        .expect(404)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("comment not found");
-        });
-    });
+        return request(app)
+          .patch("/api/comments/9999")
+          .send(newVotes)
+          .expect(404)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("comment not found");
+          });
+      });
 
-    test("400: Responds with a bad request error when trying to update an invalid comment", () => {
-      const newVotes = {
-        inc_votes: 10,
-      };
+      test("400: Responds with a bad request error when trying to update an invalid comment", () => {
+        const newVotes = {
+          inc_votes: 10,
+        };
 
-      return request(app)
-        .patch("/api/comments/not-an-article")
-        .send(newVotes)
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("bad request");
-        });
-    });
+        return request(app)
+          .patch("/api/comments/not-an-article")
+          .send(newVotes)
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("bad request");
+          });
+      });
 
-    test("400: Responds with a bad request error when trying to update a comment with invalid data", () => {
-      const newVotes = {
-        inc_votes: "Not-a-number",
-      };
+      test("400: Responds with a bad request error when trying to update a comment with invalid data", () => {
+        const newVotes = {
+          inc_votes: "Not-a-number",
+        };
 
-      return request(app)
-        .patch("/api/comments/1")
-        .send(newVotes)
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("bad request");
-        });
-    });
+        return request(app)
+          .patch("/api/comments/1")
+          .send(newVotes)
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("bad request");
+          });
+      });
 
-    test("400: Responds with a bad request error when trying to update a comment with incorrectly named data", () => {
-      const newVotes = {
-        not_votes: 10,
-      };
+      test("400: Responds with a bad request error when trying to update a comment with incorrectly named data", () => {
+        const newVotes = {
+          not_votes: 10,
+        };
 
-      return request(app)
-        .patch("/api/comments/1")
-        .send(newVotes)
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("bad request");
-        });
+        return request(app)
+          .patch("/api/comments/1")
+          .send(newVotes)
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("bad request");
+          });
+      });
     });
   });
 });
