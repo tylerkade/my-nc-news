@@ -110,23 +110,23 @@ exports.pushComment = (article_id, username, body) => {
     });
 };
 
-exports.patchVotes = (article_id, inc_votes) => {
-  return db
-    .query(
-      `
-    UPDATE articles
-    SET votes = votes + $1
-    WHERE article_id = $2
-    RETURNING *;
-    `,
-      [inc_votes, article_id]
-    )
-    .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "article not found" });
-      }
-      return rows[0];
-    });
+exports.patchVotes = (id, inc_votes) => {
+  const [source] = Object.keys(id);
+  const newSource = source.slice(0, -3);
+  const sqlQuery =
+    `UPDATE ` +
+    newSource +
+    "s" +
+    ` SET votes = votes + $1 WHERE ` +
+    source +
+    ` = $2 RETURNING *;`;
+  const queryValues = [inc_votes, id[source]];
+  return db.query(sqlQuery, queryValues).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: `${newSource} not found` });
+    }
+    return rows[0];
+  });
 };
 
 exports.removeComment = (comment_id) => {

@@ -67,7 +67,7 @@ exports.postComment = (req, res, next) => {
 };
 
 exports.incrementArticleVotes = (req, res, next) => {
-  const { article_id } = req.params;
+  const article_id = req.params;
   const { inc_votes } = req.body;
   patchVotes(article_id, inc_votes)
     .then((article) => {
@@ -98,6 +98,16 @@ exports.getUserById = (req, res, next) => {
   fetchUserById(username)
     .then((user) => {
       res.status(200).send({ user });
+    })
+    .catch(next);
+};
+
+exports.incrementCommentVotes = (req, res, next) => {
+  const comment_id = req.params;
+  const { inc_votes } = req.body;
+  patchVotes(comment_id, inc_votes)
+    .then((comment) => {
+      res.status(200).send({ comment });
     })
     .catch(next);
 };
