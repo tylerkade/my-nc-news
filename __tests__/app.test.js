@@ -502,17 +502,111 @@ describe("/api/articles/:article_id/comments", () => {
   });
 });
 
-describe("DELETE /api/comments/:comment_id", () => {
-  test("204: Responds with a 204 status code and no content when deleting a comment", () => {
-    return request(app).delete("/api/comments/1").expect(204);
+describe("/api/comments/:comment_id", () => {
+  describe("DELETE", () => {
+    test("204: Responds with a 204 status code and no content when deleting a comment", () => {
+      return request(app).delete("/api/comments/1").expect(204);
+    });
+
+    test("404: Responds with a comment not found error when trying to delete a comment that doesn't exist", () => {
+      return request(app).delete("/api/comments/999").expect(404);
+    });
+
+    test("400: Responds with a bad request error when trying to delete an invalid comment", () => {
+      return request(app).delete("/api/comments/not-a-comment_id").expect(400);
+    });
   });
 
-  test("404: Responds with a comment not found error when trying to delete a comment that doesn't exist", () => {
-    return request(app).delete("/api/comments/999").expect(404);
+  describe("PATCH", () => {
+    test("200: Responds with the updated comment with added votes", () => {
+      const newVotes = {
+        inc_votes: 10,
+      };
+
+      return request(app)
+        .patch("/api/comments/1")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment.votes).toBe(26);
+        });
+    });
+
+    test("200: Responds with the updated comment with added negative votes", () => {
+      const newVotes = {
+        inc_votes: -10,
+      };
+
+      return request(app)
+        .patch("/api/comments/1")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment.votes).toBe(6);
+        });
+    });
   });
 
-  test("400: Responds with a bad request error when trying to delete an invalid comment", () => {
-    return request(app).delete("/api/comments/not-a-comment_id").expect(400);
+  test("404: Responds with a comment not found error when trying to update a comment that doesn't exist", () => {
+    const newVotes = {
+      inc_votes: 10,
+    };
+
+    return request(app)
+      .patch("/api/comments/9999")
+      .send(newVotes)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("comment not found");
+      });
+  });
+
+  test("400: Responds with a bad request error when trying to update an invalid comment", () => {
+    const newVotes = {
+      inc_votes: 10,
+    };
+
+    return request(app)
+      .patch("/api/comments/not-an-article")
+      .send(newVotes)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("bad request");
+      });
+  });
+
+  test("400: Responds with a bad request error when trying to update a comment with invalid data", () => {
+    const newVotes = {
+      inc_votes: "Not-a-number",
+    };
+
+    return request(app)
+      .patch("/api/comments/1")
+      .send(newVotes)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("bad request");
+      });
+  });
+
+  test("400: Responds with a bad request error when trying to update a comment with incorrectly named data", () => {
+    const newVotes = {
+      not_votes: 10,
+    };
+
+    return request(app)
+      .patch("/api/comments/1")
+      .send(newVotes)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("bad request");
+      });
   });
 });
 
