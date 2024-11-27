@@ -6,21 +6,14 @@ exports.fetchTopics = () => {
   });
 };
 
-exports.fetchArticle = (id, comment_count = "false") => {
+exports.fetchArticle = (id) => {
   let sqlQuery = ``;
-
-  if (comment_count.toLowerCase() === "true") {
-    sqlQuery += `
+  sqlQuery += `
     SELECT a.*, COUNT(c.comment_id)::INTEGER AS comment_count
     FROM articles a
     LEFT JOIN comments c ON a.article_id = c.article_id
     WHERE a.article_id = $1
     GROUP BY a.article_id;`;
-  } else {
-    sqlQuery += `
-    SELECT a.* FROM articles a
-    WHERE a.article_id = $1;`;
-  }
 
   return db.query(sqlQuery, [id]).then(({ rows }) => {
     if (rows.length === 0) {
