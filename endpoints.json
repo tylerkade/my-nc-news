@@ -43,7 +43,7 @@
   },
   "GET /api/articles/:article_id": {
     "description": "serves an object with an article of the specified id",
-    "queries": [{ "comment_count": ["true"] }],
+    "queries": [],
     "exampleResponse": {
       "article": {
         "article_id": 2,
@@ -53,7 +53,8 @@
         "body": "Text from the article..",
         "created_at": "2020-10-16T05:03:00.000Z",
         "votes": 0,
-        "article_img_url": "URL pointing to image"
+        "article_img_url": "URL pointing to image",
+        "comment_count": 0
       }
     }
   },
