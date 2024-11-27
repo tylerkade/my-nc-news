@@ -91,10 +91,10 @@ describe("/api/articles/:article_id", () => {
         });
     });
 
-    describe("?comment_count=[true/any-string]", () => {
-      test("200: Responds with an article object with a comment_count property", () => {
+    describe("comment_count property", () => {
+      test("200: Responds with an article object with a comment_count property when it has comments", () => {
         return request(app)
-          .get("/api/articles/1?comment_count=true")
+          .get("/api/articles/1")
           .expect(200)
           .then(({ body }) => {
             const { article } = body;
@@ -103,14 +103,14 @@ describe("/api/articles/:article_id", () => {
           });
       });
 
-      test("200: Responds with an article object without a comment_count property when given any value that is not 'true'", () => {
+      test("200: Responds with an article object with a comment_count property of 0 when it doesn't have any comments", () => {
         return request(app)
-          .get("/api/articles/1?comment_count=any-value-including-false")
+          .get("/api/articles/2")
           .expect(200)
           .then(({ body }) => {
             const { article } = body;
-            expect(article.article_id).toBe(1);
-            expect(article).not.toHaveProperty("comment_count");
+            expect(article.article_id).toBe(2);
+            expect(article.comment_count).toBe(0);
           });
       });
     });
