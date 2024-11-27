@@ -183,3 +183,30 @@ exports.fetchUserById = (username) => {
       return rows[0];
     });
 };
+
+exports.pushArticle = (author, title, body, topic, article_img_url) => {
+  const hasImageUrl = article_img_url !== undefined;
+
+  const sqlQuery = `
+    INSERT INTO articles (author, title, body, topic${
+      hasImageUrl ? ", article_img_url" : ""
+    })
+    VALUES ($1, $2, $3, $4${hasImageUrl ? ", $5" : ""})
+    RETURNING *;`;
+  const queryValues = hasImageUrl
+    ? [author, title, body, topic, article_img_url]
+    : [author, title, body, topic];
+
+  return db.query(sqlQuery, queryValues).then(({ rows }) => {
+    const id = rows[0].article_id;
+    const newSqlQuery = `
+      SELECT a.*, COUNT(c.comment_id)::INTEGER AS comment_count
+      FROM articles a
+      LEFT JOIN comments c ON a.article_id = c.article_id
+      WHERE a.article_id = $1
+      GROUP BY a.article_id;`;
+    return db.query(newSqlQuery, [id]).then(({ rows }) => {
+      return rows[0];
+    });
+  });
+};

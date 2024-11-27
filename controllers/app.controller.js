@@ -10,6 +10,7 @@ const {
   fetchUsers,
   checkArticleExists,
   fetchUserById,
+  pushArticle,
 } = require("../models/app.model");
 
 exports.getApi = (req, res) => {
@@ -108,6 +109,15 @@ exports.incrementCommentVotes = (req, res, next) => {
   patchVotes(comment_id, inc_votes)
     .then((comment) => {
       res.status(200).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.postArticle = (req, res, next) => {
+  const { author, title, body, topic, article_img_url } = req.body;
+  pushArticle(author, title, body, topic, article_img_url)
+    .then((article) => {
+      res.status(201).send({ article });
     })
     .catch(next);
 };
