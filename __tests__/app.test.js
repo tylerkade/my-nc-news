@@ -54,6 +54,102 @@ describe("/api/topics", () => {
         });
     });
   });
+
+  describe("POST", () => {
+    test("201: Responds with newly created topic", () => {
+      const newTopic = {
+        slug: "New Topic Name",
+        description: "New Description",
+      };
+
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(201)
+        .then(({ body }) => {
+          const { topic } = body;
+          expect(topic.slug).toBe("New Topic Name");
+          expect(topic.description).toBe("New Description");
+        });
+    });
+
+    test("201: Responds with newly created topic (no description)", () => {
+      const newTopic = {
+        slug: "New Topic Name",
+      };
+
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(201)
+        .then(({ body }) => {
+          const { topic } = body;
+          expect(topic.slug).toBe("New Topic Name");
+          expect(topic.description).toBe(null);
+        });
+    });
+
+    test("400: Responds with a bad request error when no slug is provided", () => {
+      const newTopic = {
+        description: "New Description",
+      };
+
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("bad request");
+        });
+    });
+
+    test("400: Responds with a bad request error message when no data is provided", () => {
+      const newTopic = {};
+
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("bad request");
+        });
+    });
+
+    test("400: Responds with a bad request error message when invalid datanames are provided", () => {
+      const newTopic = {
+        not_slug: "New Topic Name",
+        description: "New Description",
+      };
+
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("bad request");
+        });
+    });
+
+    test("400: Responds with a bad request error message when trying to create a topic that already exists", () => {
+      const newTopic = {
+        slug: "paper",
+        description: "what books are made of",
+      };
+
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(400)
+        .then(({ body }) => {
+          console.log(body);
+          const { msg } = body;
+          expect(msg).toBe("topic already exists");
+        });
+    });
+  });
 });
 
 describe("/api/articles", () => {

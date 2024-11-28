@@ -279,3 +279,15 @@ exports.pushArticle = (author, title, body, topic, article_img_url) => {
     });
   });
 };
+
+exports.pushTopic = (slug, description) => {
+  const sqlQuery = `INSERT INTO topics (slug, description)
+  VALUES ($1, $2)
+  RETURNING *;`;
+
+  queryValues = [slug, description];
+
+  return db.query(sqlQuery, queryValues).then(({ rows }) => {
+    return rows[0];
+  });
+};
