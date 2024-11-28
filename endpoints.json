@@ -25,7 +25,9 @@
           "comment_count"
         ]
       },
-      "order"
+      "order",
+      "limit",
+      "p"
     ],
     "exampleResponse": {
       "articles": [
@@ -147,6 +149,28 @@
       "author": "butter_bridge",
       "votes": 10,
       "created_at": "2024-11-16T05:03:00.000Z"
+    }
+  },
+  "POST /api/articles": {
+    "description": "posts an article object containing valid criteria, and serves it back to the user",
+    "queries": [],
+    "exampleInput": {
+      "author": "butter_bridge",
+      "title": "New title",
+      "body": "New body",
+      "topic": "cats",
+      "article_img_url": "URL"
+    },
+    "exampleResponse": {
+      "article_id": 19,
+      "author": "butter_bridge",
+      "title": "New title",
+      "body": "New body",
+      "topic": "cats",
+      "article_img_url": "URL",
+      "votes": 0,
+      "created_at": "2024-11-16T05:03:00.000Z",
+      "comment_count": 0
     }
   }
 }

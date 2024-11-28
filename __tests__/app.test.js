@@ -59,11 +59,13 @@ describe("/api/articles", () => {
   describe("GET", () => {
     test("200: Responds with an array of articles", () => {
       return request(app)
-        .get("/api/articles")
+        .get("/api/articles?sort_by=article_id&order=asc")
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          expect(articles).toHaveLength(13);
+          const { totalCount } = body;
+          expect(totalCount).toBe(13);
+          expect(articles).toHaveLength(10);
           articles.forEach((article) => {
             expect(article).toHaveProperty("author");
             expect(article).toHaveProperty("title");
@@ -149,13 +151,15 @@ describe("/api/articles", () => {
         });
     });
 
-    test("200: Responds with an empty array when querying an existing topic that has no articles", () => {
+    test("404: Responds with an not found error when querying an existing topic that has no articles", () => {
       return request(app)
         .get("/api/articles?topic=paper")
-        .expect(200)
+        .expect(404)
         .then(({ body }) => {
-          const { articles } = body;
-          expect(articles).toEqual([]);
+          const { msg } = body;
+          expect(msg).toBe("no articles found for that request");
+          //const { articles } = body;
+          //expect(articles).toEqual([]);
         });
     });
 
@@ -167,6 +171,78 @@ describe("/api/articles", () => {
           const { msg } = body;
           expect(msg).toBe("topic not found");
           // Maybe have it send an empty array instead of an err?
+        });
+    });
+
+    test("200: Responds with 10 articles (default)", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const { totalCount } = body;
+          expect(articles).toHaveLength(10);
+          expect(totalCount).toBe(13);
+        });
+    });
+
+    test("200: Responds with page 2", () => {
+      return request(app)
+        .get("/api/articles?p=2")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const { totalCount } = body;
+          expect(articles).toHaveLength(3);
+          expect(totalCount).toBe(13);
+        });
+    });
+
+    test("200: Responds with page 2 with a limit of 7", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id&order=asc&limit=5&p=2")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const { totalCount } = body;
+          expect(articles).toHaveLength(5);
+          expect(totalCount).toBe(13);
+        });
+    });
+
+    test("200: Multiple queries", () => {
+      return request(app)
+        .get("/api/articles?topic=cats&limit=5&p=1")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const { totalCount } = body;
+          expect(articles).toHaveLength(1);
+          expect(totalCount).toBe(1);
+        });
+    });
+
+    test("404: Responds with a not found error when there are no articles on the selected page", () => {
+      return request(app)
+        .get(
+          "/api/articles?topic=cats&sort_by=article_id&order=asc&limit=5&p=8"
+        )
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("no articles found on requested page");
+        });
+    });
+
+    test("404: Responds with a not found error when there are no articles found at all for the query", () => {
+      return request(app)
+        .get(
+          "/api/articles?topic=paper&sort_by=article_id&order=asc&limit=5&p=2"
+        )
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("no articles found for that request");
         });
     });
   });

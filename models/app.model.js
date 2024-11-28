@@ -26,7 +26,9 @@ exports.fetchArticle = (id) => {
 exports.fetchArticles = async (
   sort_by = "created_at",
   order = "DESC",
-  topic
+  topic,
+  limit = 10,
+  p = 1
 ) => {
   const validSortBy = [
     "created_at",
@@ -49,12 +51,27 @@ exports.fetchArticles = async (
     return Promise.reject({ status: 400, msg: "bad request" });
   }
 
+  limit = Number(limit);
+  p = Number(p);
+
+  if (typeof limit !== "number" || limit <= 0) {
+    return Promise.reject({ status: 400, msg: "invalid limit" });
+  }
+  if (typeof p !== "number" || p <= 0) {
+    return Promise.reject({ status: 400, msg: "invalid page number" });
+  }
+
   let sqlQuery = `
     SELECT a.article_id, a.title, a.topic, a.author, a.created_at, 
     a.votes, COUNT(c.comment_id)::INTEGER AS comment_count
     FROM articles a
     LEFT JOIN comments c ON a.article_id = c.article_id `;
   const queryValues = [];
+
+  let countQuery = `
+  SELECT COUNT(DISTINCT a.*)
+  FROM articles a 
+  LEFT JOIN comments c ON a.article_id = c.article_id `;
 
   if (topic) {
     const getValidTopics = () => {
@@ -67,19 +84,52 @@ exports.fetchArticles = async (
       } else {
         queryValues.push(topic);
         sqlQuery += `WHERE topic = $${queryValues.length} `;
+        countQuery += `WHERE topic = $${queryValues.length} `;
       }
     });
   }
 
   sqlQuery += `GROUP BY a.article_id `;
+  sqlQuery += `ORDER BY ${sort_by} ${order} `;
 
-  if (sort_by) {
-    sqlQuery += `ORDER BY ${sort_by} ${order} `;
+  const offset = (p - 1) * limit;
+  queryValues.push(limit, offset);
+  sqlQuery += `LIMIT $${queryValues.length - 1} OFFSET $${queryValues.length}`;
+
+  console.log(sqlQuery, "sqlQuery");
+  console.log(queryValues, "queryValues");
+  console.log(countQuery, "countQuery");
+  console.log(queryValues.slice(0, -2), "queryValues.slice(0, -2)");
+
+  const [articlesResult, countResult] = await Promise.all([
+    db.query(sqlQuery, queryValues),
+    db.query(countQuery, queryValues.slice(0, -2)),
+  ]);
+
+  const totalCount = parseInt(countResult.rows[0].count, 10);
+
+  console.log(articlesResult.rows, "articlesResult.rows");
+  console.log(totalCount, "totalCount");
+
+  if (totalCount <= 0) {
+    console.log("inside totalCount if");
+    return Promise.reject({
+      status: 404,
+      msg: "no articles found for that request",
+    });
   }
 
-  return db.query(sqlQuery, queryValues).then(({ rows }) => {
-    return rows;
-  });
+  if (!articlesResult.rows.length) {
+    return Promise.reject({
+      status: 404,
+      msg: "no articles found on requested page",
+    });
+  }
+
+  return {
+    articles: articlesResult.rows,
+    totalCount,
+  };
 };
 
 exports.fetchArticleByIdComments = (id) => {
