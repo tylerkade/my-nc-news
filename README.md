@@ -27,7 +27,8 @@ To run the tests, simply run `npm test app`
 
 ### Server Hosted version
 
-Link: <a href="https://my-nc-news-t13l.onrender.com" target="_blank">My NC News</a>
+<a href="https://my-nc-news-t13l.onrender.com" target="_blank" rel="noopener noreferrer">My NC News</a>
+
 
 ## Versions
 
