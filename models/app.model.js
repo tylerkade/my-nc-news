@@ -123,9 +123,25 @@ exports.fetchArticles = async (
   };
 };
 
-exports.fetchArticleByIdComments = async (id, limit = 10, p = 1) => {
+exports.fetchArticleComments = async (
+  id,
+  sort_by = "created_at",
+  order = "DESC",
+  limit = 10,
+  p = 1
+) => {
+  const validSortBy = ["comment_id", "author", "votes", "created_at"];
   limit = Number(limit);
   p = Number(p);
+
+  if (!validSortBy.includes(sort_by.toLowerCase())) {
+    return Promise.reject({ status: 404, msg: "column not found" });
+  }
+
+  const validOrder = ["ASC", "DESC"];
+  if (!validOrder.includes(order.toUpperCase())) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
 
   if (typeof limit !== "number" || limit <= 0) {
     return Promise.reject({ status: 400, msg: "invalid limit" });
@@ -140,7 +156,7 @@ exports.fetchArticleByIdComments = async (id, limit = 10, p = 1) => {
   const sqlQuery = `
   SELECT * FROM comments
   WHERE article_id = $1
-  ORDER BY created_at DESC
+  ORDER BY ${sort_by} ${order}
   LIMIT $2 OFFSET $3;`;
 
   const countQuery = `

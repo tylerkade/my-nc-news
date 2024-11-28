@@ -3,7 +3,7 @@ const articlesRouter = require("express").Router();
 const {
   getArticleById,
   getArticles,
-  getArticleByIdComments,
+  getArticleComments,
   postComment,
   incrementArticleVotes,
   postArticle,
@@ -20,7 +20,7 @@ articlesRouter
 
 articlesRouter
   .route("/:article_id/comments")
-  .get(getArticleByIdComments)
+  .get(getArticleComments)
   .post(postComment);
 
 module.exports = articlesRouter;

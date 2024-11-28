@@ -664,7 +664,7 @@ describe("/api/articles", () => {
             });
         });
 
-        test("200: Responds with an array of comments from the specified article sorted by created_at (DESC)", () => {
+        test("200: Responds with an array of comments from the specified article sorted by created_at order of DESC (default)", () => {
           return request(app)
             .get("/api/articles/1/comments")
             .expect(200)
@@ -742,7 +742,7 @@ describe("/api/articles", () => {
             });
         });
 
-        test("200: Responds with a not found error when there are no comments on the selected page", () => {
+        test("200: Responds with an empty array when there are no comments on the selected page", () => {
           return request(app)
             .get("/api/articles/1/comments?limit=10&p=3")
             .expect(200)
@@ -763,6 +763,18 @@ describe("/api/articles", () => {
               const { totalCount } = body;
               expect(comments).toEqual([]);
               expect(totalCount).toBe(0);
+            });
+        });
+
+        test("200: Responds with an array of comments sorted by votes DESC", () => {
+          return request(app)
+            .get("/api/articles/1/comments?sort_by=votes")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              expect(comments).toBeSortedBy("votes", {
+                descending: true,
+              });
             });
         });
       });

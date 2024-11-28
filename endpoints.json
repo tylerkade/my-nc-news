@@ -25,9 +25,9 @@
           "comment_count"
         ]
       },
-      "order",
-      "limit",
-      "p"
+      { "order": ["ASC", "DESC"] },
+      { "limit": "Any number above 0" },
+      { "p": "Any number above 0" }
     ],
     "exampleResponse": {
       "articles": [
@@ -79,7 +79,14 @@
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments on the specified article",
-    "queries": ["limit", "p"],
+    "queries": [
+      {
+        "sort_by": ["comment_id", "author", "votes", "created_at"]
+      },
+      { "order": ["ASC", "DESC"] },
+      { "limit": "Any number above 0" },
+      { "p": "Any number above 0" }
+    ],
     "exampleResponse": {
       "comment_id": 1,
       "body": "Lobster pot",

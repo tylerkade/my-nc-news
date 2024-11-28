@@ -3,7 +3,7 @@ const {
   fetchTopics,
   fetchArticle,
   fetchArticles,
-  fetchArticleByIdComments,
+  fetchArticleComments,
   pushComment,
   patchVotes,
   removeComment,
@@ -45,13 +45,13 @@ exports.getArticles = (req, res, next) => {
     .catch(next);
 };
 
-exports.getArticleByIdComments = (req, res, next) => {
+exports.getArticleComments = (req, res, next) => {
   const { article_id } = req.params;
-  const { limit, p } = req.query;
+  const { sort_by, order, limit, p } = req.query;
 
   checkArticleExists(article_id)
     .then(() => {
-      return fetchArticleByIdComments(article_id, limit, p);
+      return fetchArticleComments(article_id, sort_by, order, limit, p);
     })
     .then(({ comments, totalCount }) => {
       res.status(200).send({ comments, totalCount });
