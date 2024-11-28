@@ -12,6 +12,7 @@ const {
   fetchUserById,
   pushArticle,
   pushTopic,
+  removeArticle,
 } = require("../models/app.model");
 
 exports.getApi = (req, res) => {
@@ -128,6 +129,15 @@ exports.postTopic = (req, res, next) => {
   pushTopic(slug, description)
     .then((topic) => {
       res.status(201).send({ topic });
+    })
+    .catch(next);
+};
+
+exports.deleteArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  removeArticle(article_id)
+    .then(() => {
+      res.status(204).send();
     })
     .catch(next);
 };

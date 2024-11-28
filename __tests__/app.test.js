@@ -144,7 +144,6 @@ describe("/api/topics", () => {
         .send(newTopic)
         .expect(400)
         .then(({ body }) => {
-          console.log(body);
           const { msg } = body;
           expect(msg).toBe("topic already exists");
         });
@@ -611,6 +610,37 @@ describe("/api/articles", () => {
             const { msg } = body;
             expect(msg).toBe("bad request");
           });
+      });
+    });
+
+    describe("DELETE", () => {
+      test("204: Responds with a 204 status code and no content when deleting an article", () => {
+        return request(app).delete("/api/articles/1").expect(204);
+      });
+
+      test("204: Also removes comments from deleted article ", () => {
+        return request(app)
+          .delete("/api/articles/1")
+          .expect(204)
+          .then(() => {
+            return request(app)
+              .get("/api/articles/1/comments")
+              .expect(404)
+              .then(({ body }) => {
+                const { msg } = body;
+                expect(msg).toBe("article not found");
+              });
+          });
+      });
+
+      test("404: Responds with an article not found error when trying to delete an article that doesn't exist", () => {
+        return request(app).delete("/api/articles/999").expect(404);
+      });
+
+      test("400: Responds with a bad request error when trying to delete an invalid article", () => {
+        return request(app)
+          .delete("/api/articles/not-a-comment_id")
+          .expect(400);
       });
     });
 
