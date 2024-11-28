@@ -157,14 +157,7 @@ exports.fetchArticleByIdComments = async (id, limit = 10, p = 1) => {
     if (totalCount === 0 || !commentsResults.rows.length) {
       return { comments: [], totalCount };
     }
-    /*
-    if (!commentsResults.rows.length) {
-      return Promise.reject({
-        status: 404,
-        msg: "No comments found on the requested page",
-      });
-    }
-*/
+
     return {
       comments: commentsResults.rows,
       totalCount,
