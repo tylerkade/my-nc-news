@@ -19,7 +19,7 @@ app.use(wrongPathErrorHandler);
 app.use(postgresErrorHandler);
 
 app.use(customErrorHandler);
-
+console.log("At the end before Server Error")
 app.use(serverErrorHandler);
 
 module.exports = app;

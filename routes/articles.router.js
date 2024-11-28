@@ -8,6 +8,9 @@ const {
   incrementArticleVotes,
   postArticle,
 } = require("../controllers/app.controller");
+console.log("Inside Articles Router");
+
+articlesRouter.route("/").get(getArticles).post(postArticle);
 
 articlesRouter
   .route("/:article_id")
@@ -18,7 +21,5 @@ articlesRouter
   .route("/:article_id/comments")
   .get(getArticleByIdComments)
   .post(postComment);
-
-articlesRouter.route("/").get(getArticles).post(postArticle);
 
 module.exports = articlesRouter;
