@@ -79,7 +79,7 @@
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments on the specified article",
-    "queries": [],
+    "queries": ["limit", "p"],
     "exampleResponse": {
       "comment_id": 1,
       "body": "Lobster pot",

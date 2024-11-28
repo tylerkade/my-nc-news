@@ -1,3 +1,4 @@
+const { totalCount } = require("../db/connection");
 const endpointsJson = require("../endpoints.json");
 
 /* Set up your test imports here */
@@ -525,7 +526,7 @@ describe("/api/articles", () => {
             .expect(200)
             .then(({ body }) => {
               const { comments } = body;
-              expect(comments).toHaveLength(11);
+              expect(comments).toHaveLength(10);
               comments.forEach((comment) => {
                 expect(comment).toHaveProperty("comment_id");
                 expect(comment).toHaveProperty("votes");
@@ -576,6 +577,66 @@ describe("/api/articles", () => {
             .then(({ body }) => {
               const { msg } = body;
               expect(msg).toBe("bad request");
+            });
+        });
+
+        test("200: Responds with 10 comments (default)", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              const { totalCount } = body;
+              expect(comments).toHaveLength(10);
+              expect(totalCount).toBe(11);
+            });
+        });
+
+        test("200: Responds with page 2", () => {
+          return request(app)
+            .get("/api/articles/1/comments?p=2")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              const { totalCount } = body;
+              expect(comments).toHaveLength(1);
+              expect(totalCount).toBe(11);
+            });
+        });
+
+        test("200: Responds with page 3 with a limit of 4", () => {
+          return request(app)
+            .get("/api/articles/1/comments?limit=4&p=3")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              const { totalCount } = body;
+              expect(comments).toHaveLength(3);
+              expect(totalCount).toBe(11);
+            });
+        });
+
+        test("200: Responds with a not found error when there are no comments on the selected page", () => {
+          return request(app)
+            .get("/api/articles/1/comments?limit=10&p=3")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              const { totalCount } = body;
+              expect(comments).toEqual([]);
+              expect(totalCount).toBe(11);
+            });
+        });
+
+        test("200: Responds with an empty array when there are no comments found at all for the query", () => {
+          return request(app)
+            .get("/api/articles/4/comments?limit=5&p=2")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              const { totalCount } = body;
+              expect(comments).toEqual([]);
+              expect(totalCount).toBe(0);
             });
         });
       });

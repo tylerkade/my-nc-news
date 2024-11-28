@@ -45,14 +45,14 @@ exports.getArticles = (req, res, next) => {
 
 exports.getArticleByIdComments = (req, res, next) => {
   const { article_id } = req.params;
-  const promises = [
-    fetchArticleByIdComments(article_id),
-    checkArticleExists(article_id),
-  ];
+  const { limit, p } = req.query;
 
-  Promise.all(promises)
-    .then(([comments]) => {
-      res.status(200).send({ comments });
+  checkArticleExists(article_id)
+    .then(() => {
+      return fetchArticleByIdComments(article_id, limit, p);
+    })
+    .then(({ comments, totalCount }) => {
+      res.status(200).send({ comments, totalCount });
     })
     .catch(next);
 };

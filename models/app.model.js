@@ -123,18 +123,53 @@ exports.fetchArticles = async (
   };
 };
 
-exports.fetchArticleByIdComments = (id) => {
-  return db
-    .query(
-      `
-      SELECT * FROM comments
-      WHERE article_id = $1
-      ORDER BY created_at DESC;`,
-      [id]
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+exports.fetchArticleByIdComments = async (id, limit = 10, p = 1) => {
+  limit = Number(limit);
+  p = Number(p);
+
+  if (typeof limit !== "number" || limit <= 0) {
+    return Promise.reject({ status: 400, msg: "invalid limit" });
+  }
+  if (typeof p !== "number" || p <= 0) {
+    return Promise.reject({ status: 400, msg: "invalid page number" });
+  }
+
+  queryValues = [id];
+  const offset = (p - 1) * limit;
+
+  const sqlQuery = `
+  SELECT * FROM comments
+  WHERE article_id = $1
+  ORDER BY created_at DESC
+  LIMIT $2 OFFSET $3;`;
+
+  const countQuery = `
+  SELECT COUNT(*)
+  FROM comments 
+  WHERE article_id = $1;`;
+
+  return Promise.all([
+    db.query(sqlQuery, [...queryValues, limit, offset]),
+    db.query(countQuery, queryValues),
+  ]).then(([commentsResults, countResult]) => {
+    const totalCount = parseInt(countResult.rows[0].count, 10);
+
+    if (totalCount === 0 || !commentsResults.rows.length) {
+      return { comments: [], totalCount };
+    }
+    /*
+    if (!commentsResults.rows.length) {
+      return Promise.reject({
+        status: 404,
+        msg: "No comments found on the requested page",
+      });
+    }
+*/
+    return {
+      comments: commentsResults.rows,
+      totalCount,
+    };
+  });
 };
 
 exports.pushComment = (article_id, username, body) => {
