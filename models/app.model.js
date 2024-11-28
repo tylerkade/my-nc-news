@@ -96,11 +96,6 @@ exports.fetchArticles = async (
   queryValues.push(limit, offset);
   sqlQuery += `LIMIT $${queryValues.length - 1} OFFSET $${queryValues.length}`;
 
-  console.log(sqlQuery, "sqlQuery");
-  console.log(queryValues, "queryValues");
-  console.log(countQuery, "countQuery");
-  console.log(queryValues.slice(0, -2), "queryValues.slice(0, -2)");
-
   const [articlesResult, countResult] = await Promise.all([
     db.query(sqlQuery, queryValues),
     db.query(countQuery, queryValues.slice(0, -2)),
@@ -108,11 +103,7 @@ exports.fetchArticles = async (
 
   const totalCount = parseInt(countResult.rows[0].count, 10);
 
-  console.log(articlesResult.rows, "articlesResult.rows");
-  console.log(totalCount, "totalCount");
-
   if (totalCount <= 0) {
-    console.log("inside totalCount if");
     return Promise.reject({
       status: 404,
       msg: "no articles found for that request",

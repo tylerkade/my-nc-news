@@ -59,7 +59,7 @@ describe("/api/articles", () => {
   describe("GET", () => {
     test("200: Responds with an array of articles", () => {
       return request(app)
-        .get("/api/articles?sort_by=article_id&order=asc")
+        .get("/api/articles")
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
