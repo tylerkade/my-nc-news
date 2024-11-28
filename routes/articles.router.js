@@ -8,7 +8,7 @@ const {
   incrementArticleVotes,
   postArticle,
   deleteArticle,
-} = require("../controllers/app.controller");
+} = require("../controllers/articles.controller");
 
 articlesRouter.route("/").get(getArticles).post(postArticle);
 

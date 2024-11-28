@@ -1,4 +1,3 @@
-const { totalCount } = require("../db/connection");
 const endpointsJson = require("../endpoints.json");
 
 /* Set up your test imports here */
