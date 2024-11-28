@@ -6,7 +6,7 @@ const commentsRouter = require("./comments.router");
 const usersRouter = require("./users.router");
 
 const { getApi } = require("../controllers/app.controller");
-console.log("Inside API Router")
+
 apiRouter.use("/topics", topicsRouter);
 apiRouter.use("/articles", articlesRouter);
 apiRouter.use("/comments", commentsRouter);

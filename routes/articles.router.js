@@ -8,7 +8,6 @@ const {
   incrementArticleVotes,
   postArticle,
 } = require("../controllers/app.controller");
-console.log("Inside Articles Router");
 
 articlesRouter.route("/").get(getArticles).post(postArticle);
 
