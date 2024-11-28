@@ -11,6 +11,7 @@ const {
   checkArticleExists,
   fetchUserById,
   pushArticle,
+  pushTopic,
 } = require("../models/app.model");
 
 exports.getApi = (req, res) => {
@@ -118,6 +119,15 @@ exports.postArticle = (req, res, next) => {
   pushArticle(author, title, body, topic, article_img_url)
     .then((article) => {
       res.status(201).send({ article });
+    })
+    .catch(next);
+};
+
+exports.postTopic = (req, res, next) => {
+  const { slug, description } = req.body;
+  pushTopic(slug, description)
+    .then((topic) => {
+      res.status(201).send({ topic });
     })
     .catch(next);
 };
