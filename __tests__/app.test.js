@@ -516,169 +516,169 @@ describe("/api/articles", () => {
           });
       });
     });
-  });
 
-  describe("/comments", () => {
-    describe("GET", () => {
-      test("200: Responds with an array of comments from the specified article", () => {
-        return request(app)
-          .get("/api/articles/1/comments")
-          .expect(200)
-          .then(({ body }) => {
-            const { comments } = body;
-            expect(comments).toHaveLength(11);
-            comments.forEach((comment) => {
+    describe("/comments", () => {
+      describe("GET", () => {
+        test("200: Responds with an array of comments from the specified article", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              expect(comments).toHaveLength(11);
+              comments.forEach((comment) => {
+                expect(comment).toHaveProperty("comment_id");
+                expect(comment).toHaveProperty("votes");
+                expect(comment).toHaveProperty("created_at");
+                expect(comment).toHaveProperty("author");
+                expect(comment).toHaveProperty("body");
+                expect(comment.article_id).toBe(1);
+              });
+            });
+        });
+
+        test("200: Responds with an array of comments from the specified article sorted by created_at (DESC)", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              expect(comments).toBeSortedBy("created_at", {
+                descending: true,
+              });
+            });
+        });
+
+        test("404: Responds with an 'article not found' error message (article doesn't exist)", () => {
+          return request(app)
+            .get("/api/articles/9999/comments")
+            .expect(404)
+            .then(({ body }) => {
+              const { msg } = body;
+              expect(msg).toBe("article not found");
+            });
+        });
+
+        test("200: Responds with an empty array (article exists, no comments)", () => {
+          return request(app)
+            .get("/api/articles/2/comments")
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+              expect(comments).toEqual([]);
+            });
+        });
+
+        test("400: Responds with an bad request error message when invalid path is given", () => {
+          return request(app)
+            .get("/api/articles/not-an-id/comments")
+            .expect(400)
+            .then(({ body }) => {
+              const { msg } = body;
+              expect(msg).toBe("bad request");
+            });
+        });
+      });
+
+      describe("POST", () => {
+        test("201: Inserts a new comment to the db and sends the comment back to the client", () => {
+          const newComment = {
+            username: "butter_bridge",
+            body: "New comment",
+          };
+
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+              const { comment } = body;
               expect(comment).toHaveProperty("comment_id");
               expect(comment).toHaveProperty("votes");
               expect(comment).toHaveProperty("created_at");
-              expect(comment).toHaveProperty("author");
-              expect(comment).toHaveProperty("body");
+              expect(comment.author).toBe("butter_bridge");
+              expect(comment.body).toBe("New comment");
               expect(comment.article_id).toBe(1);
             });
-          });
-      });
+        });
 
-      test("200: Responds with an array of comments from the specified article sorted by created_at (DESC)", () => {
-        return request(app)
-          .get("/api/articles/1/comments")
-          .expect(200)
-          .then(({ body }) => {
-            const { comments } = body;
-            expect(comments).toBeSortedBy("created_at", {
-              descending: true,
+        test("404: Responds with an not found error when an non-existing username is provided", () => {
+          const newComment = {
+            username: "wrong_username",
+            body: "New comment",
+          };
+
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+              const { msg } = body;
+              expect(msg).toBe("not found");
             });
-          });
-      });
+        });
 
-      test("404: Responds with an 'article not found' error message (article doesn't exist)", () => {
-        return request(app)
-          .get("/api/articles/9999/comments")
-          .expect(404)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("article not found");
-          });
-      });
+        test("400: Responds with an bad request error message when an no username is provided", () => {
+          const newComment = {
+            body: "New comment",
+          };
 
-      test("200: Responds with an empty array (article exists, no comments)", () => {
-        return request(app)
-          .get("/api/articles/2/comments")
-          .expect(200)
-          .then(({ body }) => {
-            const { comments } = body;
-            expect(comments).toEqual([]);
-          });
-      });
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+              const { msg } = body;
+              expect(msg).toBe("bad request");
+            });
+        });
 
-      test("400: Responds with an bad request error message when invalid path is given", () => {
-        return request(app)
-          .get("/api/articles/not-an-id/comments")
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("bad request");
-          });
-      });
-    });
+        test("400: Responds with an bad request error message when an no comment is provided", () => {
+          const newComment = {
+            username: "butter_bridge",
+          };
 
-    describe("POST", () => {
-      test("201: Inserts a new comment to the db and sends the comment back to the client", () => {
-        const newComment = {
-          username: "butter_bridge",
-          body: "New comment",
-        };
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+              const { msg } = body;
+              expect(msg).toBe("bad request");
+            });
+        });
 
-        return request(app)
-          .post("/api/articles/1/comments")
-          .send(newComment)
-          .expect(201)
-          .then(({ body }) => {
-            const { comment } = body;
-            expect(comment).toHaveProperty("comment_id");
-            expect(comment).toHaveProperty("votes");
-            expect(comment).toHaveProperty("created_at");
-            expect(comment.author).toBe("butter_bridge");
-            expect(comment.body).toBe("New comment");
-            expect(comment.article_id).toBe(1);
-          });
-      });
+        test("404: Responds with an not found error when the article doesn't exist", () => {
+          const newComment = {
+            username: "butter_bridge",
+            body: "New comment",
+          };
 
-      test("404: Responds with an not found error when an non-existing username is provided", () => {
-        const newComment = {
-          username: "wrong_username",
-          body: "New comment",
-        };
+          return request(app)
+            .post("/api/articles/9999/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+              const { msg } = body;
+              expect(msg).toBe("not found");
+            });
+        });
 
-        return request(app)
-          .post("/api/articles/1/comments")
-          .send(newComment)
-          .expect(404)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("not found");
-          });
-      });
+        test("400: Responds with an bad request error message when the path is invalid", () => {
+          const newComment = {
+            username: "butter_bridge",
+            body: "New comment",
+          };
 
-      test("400: Responds with an bad request error message when an no username is provided", () => {
-        const newComment = {
-          body: "New comment",
-        };
-
-        return request(app)
-          .post("/api/articles/1/comments")
-          .send(newComment)
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("bad request");
-          });
-      });
-
-      test("400: Responds with an bad request error message when an no comment is provided", () => {
-        const newComment = {
-          username: "butter_bridge",
-        };
-
-        return request(app)
-          .post("/api/articles/1/comments")
-          .send(newComment)
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("bad request");
-          });
-      });
-
-      test("404: Responds with an not found error when the article doesn't exist", () => {
-        const newComment = {
-          username: "butter_bridge",
-          body: "New comment",
-        };
-
-        return request(app)
-          .post("/api/articles/9999/comments")
-          .send(newComment)
-          .expect(404)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("not found");
-          });
-      });
-
-      test("400: Responds with an bad request error message when the path is invalid", () => {
-        const newComment = {
-          username: "butter_bridge",
-          body: "New comment",
-        };
-
-        return request(app)
-          .post("/api/articles/now-a-path/comments")
-          .send(newComment)
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("bad request");
-          });
+          return request(app)
+            .post("/api/articles/now-a-path/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+              const { msg } = body;
+              expect(msg).toBe("bad request");
+            });
+        });
       });
     });
   });
