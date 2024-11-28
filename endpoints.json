@@ -184,5 +184,9 @@
       "slug": "New Topic",
       "description": "New Description"
     }
+  },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes the specified article, and any associated comments",
+    "queries": []
   }
 }
