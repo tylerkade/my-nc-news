@@ -13,6 +13,7 @@ jobs:
         run: echo 'Hello from the pipeline'
 
   test-utils:
+    needs: greeting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout and clone repo
@@ -31,14 +32,14 @@ jobs:
       - name: Setup PSQL
         uses: harmon758/postgresql-action@v1
         with:
-          postgresql dbs: test-db
-          postgresql users: mr_testerson
-          postgresql password: pa55w0rd
+          postgresql dbs: ${{ secrets.TEST_DATABASE }}
+          postgresql users: ${{ secrets.POSTGRESQL_USERS }}
+          postgresql password: ${{ secrets.POSTGRESQL_PASSWORD }}
 
       - name: Install dependencies
         run: npm install
       - name: Test app
-        run: PGDATABASE=${{ secrets.TEST_DATABASE }} npm run test app
+        run: PGDATABASE="${{ secrets.TEST_DATABASE }}" npm run test app
 
   test-app-live-db:
     needs: test-app
@@ -49,4 +50,4 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Test app with live database
-        run: NODE_ENV=production DATABASE_URL=${{ secrets.DATABASE_URL }} npm run test app
+        run: NODE_ENV=production DATABASE_URL="${{ secrets.DATABASE_URL }}" npm run test app
