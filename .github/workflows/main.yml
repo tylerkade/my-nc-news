@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Test app
-        run: PGDATABASE="${{ secrets.TEST_DATABASE }}" npm run test app
+        run: PGDATABASE="${{ secrets.TEST_DATABASE }}" PGUSER=${{ secrets.POSTGRESQL_USERS }} PGPASSWORD=${{ secrets.POSTGRESQL_PASSWORD }} npm run test app
 
   test-app-live-db:
     needs: test-app
