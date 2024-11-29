@@ -1,8 +1,7 @@
 const db = require("../db/connection");
 
 exports.fetchArticle = (id) => {
-  let sqlQuery = ``;
-  sqlQuery += `
+  let sqlQuery = `
       SELECT a.*, COUNT(c.comment_id)::INTEGER AS comment_count
       FROM articles a
       LEFT JOIN comments c ON a.article_id = c.article_id
