@@ -37,6 +37,12 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: setup-db
+        run: npm run setup-dbs
+      - name: seed-db
+        run: npm run seed
+
       - name: Test app
         run: |
           PGDATABASE="${{ secrets.TEST_DATABASE }}" \
