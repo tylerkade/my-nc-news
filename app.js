@@ -1,5 +1,6 @@
 const express = require("express");
 const apiRouter = require("./routes/api.router");
+const cors = require("cors");
 
 const {
   wrongPathErrorHandler,
@@ -9,6 +10,8 @@ const {
 } = require("./errors/app.errors");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
