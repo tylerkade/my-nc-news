@@ -57,7 +57,7 @@ exports.fetchArticles = async (
 
   let sqlQuery = `
       SELECT a.article_id, a.title, a.topic, a.author, a.created_at, 
-      a.votes, COUNT(c.comment_id)::INTEGER AS comment_count
+      a.votes, a.article_img_url, COUNT(c.comment_id)::INTEGER AS comment_count
       FROM articles a
       LEFT JOIN comments c ON a.article_id = c.article_id `;
   const queryValues = [];

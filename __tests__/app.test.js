@@ -168,7 +168,7 @@ describe("/api/articles", () => {
             expect(article).toHaveProperty("topic");
             expect(article).toHaveProperty("created_at");
             expect(article).toHaveProperty("votes");
-            expect(article).not.toHaveProperty("article_img_url");
+            expect(article).toHaveProperty("article_img_url");
             expect(article).toHaveProperty("comment_count");
             expect(typeof article.comment_count).toBe("number");
             expect(article).not.toHaveProperty("body");
